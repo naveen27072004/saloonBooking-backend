@@ -18,7 +18,7 @@ const newUser = async (req,res)=>{
         });
         await user.save();
         if(user){
-            const token = jwt.sign({email:user.email,role:user.role},'saymyname',{expiresIn:'1h'});
+            const token = jwt.sign({id:user._id, email:user.email,role:user.role},'saymyname',{expiresIn:'1h'});
             return res.status(200).json({message:"User created",token:token});
         }
         else{
@@ -54,4 +54,19 @@ const loginUser = async (req,res)=>{
     }
 }
 
-module.exports = {newUser,loginUser};
+const verifyUser = async (req,res)=>{
+    try {
+        const user = await userSchema.findById(req.userId);
+        console.log(user);
+        if(!user){
+            return res.status(400).json({message:"User not found"});
+        }
+        return res.status(200).json({message:"User verified",user:user});
+
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+
+module.exports = {newUser,loginUser,verifyUser};
