@@ -7,5 +7,6 @@ const fileupload = require('../middleware/multer')
 router.post('/',auth,fileupload.single('companyprofile'),company_controller.createcompany)
 router.get('/',auth,company_controller.getcompany)
 router.get('/user',auth,company_controller.getusercompany)
+router.get('/:id',auth,company_controller.getcompanybyid)
 
 module.exports = router

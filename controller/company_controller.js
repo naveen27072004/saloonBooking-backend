@@ -7,6 +7,26 @@ const createcompany = async (req,res)=>{
     const {companyname,companydesc} = req.body
     const companyprofile = req.file ? req.file.path : null
 
+    if(!companyname || !companydesc){
+        return res.status(400).json({
+            message:"please fill your company name and desc"
+        })
+    }
+
+    const uniquecompanyname =  await companySchema({companyname})
+    if(uniquecompanyname){
+        return res.status(400).json({
+            message:"company name alredy taken please try another name"
+        })
+    }
+
+    const limitcompany = await userSchema.findById(req.userId)
+    if(limitcompany.Company){
+        return res.status(400).json({
+            message:"you have create only one company"
+        })
+    }
+
     const newcompany = new companySchema({companyname,companydesc,companyprofile})
     newcompany.save()
     if(newcompany){
@@ -54,4 +74,19 @@ const getusercompany = async(req,res) =>{
     }
 }
 
-module.exports = {createcompany,getcompany,getusercompany};
+const getcompanybyid = async(req,res) =>{
+    try {
+        const company = await companySchema.findById(req.params.id)
+        if(company){
+            return res.status(200).json({
+                message:"company fetched",
+                data:company
+            })
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+module.exports = {createcompany,getcompany,getusercompany,getcompanybyid};
