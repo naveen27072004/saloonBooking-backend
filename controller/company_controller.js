@@ -1,55 +1,57 @@
+const Company = require('../modules/company');
 const companySchema = require('../modules/company');
-const userSchema = require('../modules/user')
+const userSchema = require('../modules/user');
 
 const createcompany = async (req,res)=>{
-    try {
-        const {companyname,companydesc} = req.body
-        if(!companydesc || !companyname){
-            res.status(400).json({
-                message:"please fill the all the fields"
-            })
-        }
-        const uniquecompanyname = await companySchema.findOne({companyname})
-        if(uniquecompanyname){
-            res.status(404).json({
-                message:"alredy taken this company name"
-            })
-        }
-        const newcompany = new companySchema({companydesc,companyname})
-        if(newcompany){
-            const getuser = await userSchema.findById(req.userId)
-            console.log("getuserr",getuser)
-            getuser.Company.push(newcompany)
-            await getuser.save()
-            return res.status(200).json({
-                message:"company created",
-                data:newcompany
-            })
-        }
-    } catch (error) {
-        console.log(error)
+  try {
+    const {companyname,companydesc} = req.body
+    const companyprofile = req.file ? req.file.path : null
+
+    const newcompany = new companySchema({companyname,companydesc,companyprofile})
+    newcompany.save()
+    if(newcompany){
+        const user = await userSchema.findById(req.userId)
+        user.Company = newcompany._id
+        user.save()
+        return res.status(200).json({
+            message:"company created",
+            data:newcompany
+        })
     }
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 const getcompany = async(req,res)=>{
-    try {
-        const getourcompany = await userSchema.findById( req.userId).populate('Company')
-        console.log(getourcompany)
-        if(getourcompany){
-            return res.status(200).json({
-                message:"company found",
-                data:getourcompany.Company
-            })
-        }
-        else{
-            return res.status(404).json({
-                message:"company not found"
-            })
-        } 
+   try {
+    const company = await companySchema.find()
+    if(company){
+        return res.status(200).json({
+            message:"company fetched",
+            data:company
+        })
+    }
+   } catch (error) {
+     console.log(error)
+    
+   }
+}
 
-    } catch (error) {
-        console.log(error)
+const getusercompany = async(req,res) =>{
+    const user = await userSchema.findById(req.userId)
+    const company = await companySchema.findById(user.Company)
+    if(company){
+        return res.status(200).json({
+            message:"company fetched",
+            data:company
+        })
+    }
+    else{
+        return res.status(404).json({
+            message:"company not found"
+        })
     }
 }
 
-module.exports = {createcompany,getcompany};
+module.exports = {createcompany,getcompany,getusercompany};
