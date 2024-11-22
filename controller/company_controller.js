@@ -4,7 +4,7 @@ const userSchema = require('../modules/user');
 
 const createcompany = async (req,res)=>{
   try {
-    const {companyname,companydesc} = req.body
+    const {companyname,companydesc,companyadress,companyphone,companyphone2} = req.body
     const companyprofile = req.file ? req.file.path : null
 
     if(!companyname || !companydesc){
@@ -27,7 +27,8 @@ const createcompany = async (req,res)=>{
         })
     }
 
-    const newcompany = new companySchema({companyname,companydesc,companyprofile})
+    const newcompany = new companySchema({companyname,companydesc,companyprofile,
+        companyadress,companyphone,companyphone2})
     newcompany.save()
     if(newcompany){
         const user = await userSchema.findById(req.userId)
@@ -88,5 +89,40 @@ const getcompanybyid = async(req,res) =>{
     }
 }
 
+const updatecompanydetails = async(req,res) =>{
+  try {
+    const {id} = req.params
+    const {companyname,companydesc,companyadress,companyphone,companyphone2} = req.body
+    if(!companyname,!companydesc,!companyadress,!companyphone){
+        res.status(400).json({
+            message:"please fill the all fields"
+        })
+    }
+    const updatecompany = await companySchema.findByIdAndUpdate(id)
+    console.log(updatecompany)
+    if(!updatecompany){
+        res.status(200).json({
+            message:"company not found"
+        })
+    }
+    else{
+        updatecompany.companyname = companyname
+        updatecompany.companydesc = companydesc
+        updatecompany.companyadress = companyadress
+        updatecompany.companyphone = companyphone
+        updatecompany.companyphone2 = companyphone2
+        updatecompany.save()
+        if(updatecompany){
+            return res.json({
+                message:"updted",
+                data:updatecompany
+            })
+        }
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
 
-module.exports = {createcompany,getcompany,getusercompany,getcompanybyid};
+
+module.exports = {createcompany,getcompany,getusercompany,getcompanybyid,updatecompanydetails};
