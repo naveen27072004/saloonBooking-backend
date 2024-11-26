@@ -1,4 +1,3 @@
-const Company = require('../modules/company');
 const companySchema = require('../modules/company');
 const userSchema = require('../modules/user');
 
@@ -14,18 +13,18 @@ const createcompany = async (req,res)=>{
     }
 
     const uniquecompanyname =  await companySchema({companyname})
-    if(uniquecompanyname){
+    if(uniquecompanyname === companyname){
         return res.status(400).json({
             message:"company name alredy taken please try another name"
         })
     }
 
-    const limitcompany = await userSchema.findById(req.userId)
-    if(limitcompany.Company){
-        return res.status(400).json({
-            message:"you have create only one company"
-        })
-    }
+    // const limitcompany = await userSchema.findById(req.userId)
+    // if(limitcompany.Company){
+    //     return res.status(400).json({
+    //         message:"you have create only one company"
+    //     })
+    // }
 
     const newcompany = new companySchema({companyname,companydesc,companyprofile,
         companyadress,companyphone,companyphone2})
@@ -60,7 +59,10 @@ const getcompany = async(req,res)=>{
 }
 
 const getusercompany = async(req,res) =>{
+   try {
     const user = await userSchema.findById(req.userId)
+    console.log(user.Company.length)
+    console.log(user.Company)
     const company = await companySchema.findById(user.Company)
     if(company){
         return res.status(200).json({
@@ -69,10 +71,14 @@ const getusercompany = async(req,res) =>{
         })
     }
     else{
-        return res.status(404).json({
-            message:"company not found"
+        return res.status(400).json({
+            message:"company not ound"
         })
     }
+   } catch (error) {
+       console.log(error)
+    
+   }
 }
 
 const getcompanybyid = async(req,res) =>{
@@ -124,5 +130,25 @@ const updatecompanydetails = async(req,res) =>{
   }
 }
 
+const deletecompany = async(req,res) =>{
+    try {
+        const {id} = req.params
+        const deletecompany = await companySchema.findByIdAndDelete(id)
+        if(deletecompany){
+            return res.status(200).json({
+                message:"company deleted"
+            })
+        }
+        else{
+            return res.status(400).json({
+                message:"company not found"
+            })
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
 
-module.exports = {createcompany,getcompany,getusercompany,getcompanybyid,updatecompanydetails};
+
+module.exports = {createcompany,getcompany,getusercompany,
+    getcompanybyid,updatecompanydetails,deletecompany};

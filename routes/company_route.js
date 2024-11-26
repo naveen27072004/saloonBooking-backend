@@ -9,5 +9,6 @@ router.get('/',auth,company_controller.getcompany)
 router.get('/user',auth,company_controller.getusercompany)
 router.get('/:id',auth,company_controller.getcompanybyid)
 router.put('/:id',auth,company_controller.updatecompanydetails)
+router.delete('/:id',auth,company_controller.deletecompany)
 
 module.exports = router
