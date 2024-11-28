@@ -6,7 +6,7 @@ const createcompany = async (req,res)=>{
     const {companyname,companydesc,companyadress,companyphone,companyphone2} = req.body
     const companyprofile = req.file ? req.file.path : null
 
-    if(!companyname || !companydesc){
+    if(!companyname || !companyadress || !companyphone){
         return res.status(400).json({
             message:"please fill your company name and desc"
         })
@@ -71,7 +71,7 @@ const getusercompany = async(req,res) =>{
         })
     }
     else{
-        return res.status(400).json({
+        return res.status(201).json({
             message:"company not ound"
         })
     }
