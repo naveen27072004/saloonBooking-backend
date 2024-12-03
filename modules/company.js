@@ -11,6 +11,9 @@ const companySchema = new mongoose.Schema({
         titleprofile: { type: String },
         items: [ { type: String } ]
     }],
+    partnerjoinrequest :[{
+        partnerid: { type: mongoose.Schema.Types.ObjectId, ref: 'Partner' },
+    }]
 });
 
 const Company = mongoose.model('Company', companySchema);
