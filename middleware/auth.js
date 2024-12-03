@@ -15,7 +15,8 @@ const auth = (req,res,next)=>{
                 return res.status(401).json({message:err});
             }
             req.userId = decoded.id;
-            req.role = decoded.role
+            req.role = decoded.role;
+            req.partnerId = decoded.partnerId;
             next();
         });
     } catch (error) {
