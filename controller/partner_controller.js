@@ -1,6 +1,7 @@
 const partnermodule = require('../modules/partner')
 const companySchema = require('../modules/company');
 const userSchema = require('../modules/user');
+const mongoose = require('mongoose')
 
 
 const createpartner = async(req,res)=>{
@@ -76,6 +77,7 @@ const jointreqtocompany = async(req,res)=>{
             company.partnerjoinrequest.push(partner)
             company.save()
             partner.requeststatus.push(company)
+            partner.save()
             return res.status(200).json({
                 message:"Request sent",
                 data:company
@@ -93,24 +95,42 @@ const jointreqtocompany = async(req,res)=>{
 
 const checkjointreqststus = async(req,res)=>{
     try {
-        const user = await userSchema.findById(req.userId)
-        if(!user){
-            return res.status(400).json({
-                message:"Not have a user"
-            })
-        }
-        const partner = await partnermodule.findById(user.Partner)
-        if(!partner){
-            return res.status(400).json({
-                message:"Not have a partner"
-            })
-        }
-        res
+        // Find user by userId
+        const user = await userSchema.findById(req.userId);
         
-
+        // Validate partner ID before querying
+        if (!mongoose.Types.ObjectId.isValid(user.Partner)) {
+            return res.status(400).json({
+                message: "Invalid partner ID"
+            });
+        }
+        
+        // Find partner by partner's ID from the user's Partner field
+        const partner = await partnermodule.findById(user.Partner);
+        
+        // If partner is not found, return a 404 error
+        if (!partner) {
+            return res.status(404).json({
+                message: "Partner not found"
+            });
+        }
+        
+        // Access the request status from the partner's data
+        const jointreqtocompany = partner.requeststatus;
+        
+        // Return success response
+        return res.status(200).json({
+            message: "Partner found",
+            data: jointreqtocompany
+        });
     } catch (error) {
-        console.log(error)
+        // Return error response in case of failure
+        return res.status(500).json({
+            message: "Internal server error",
+            error: error
+        });
     }
+    
 }
 
 module.exports = {createpartner,getownpartner,getpartnerbyid,
