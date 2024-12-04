@@ -1,5 +1,6 @@
 const companySchema = require('../modules/company');
 const userSchema = require('../modules/user');
+const partnerSchema = require('../modules/partner')
 
 const createcompany = async (req,res)=>{
   try {
@@ -149,6 +150,22 @@ const deletecompany = async(req,res) =>{
     }
 }
 
+const joincompany = async(req,res)=>{
+const user = await userSchema.findById(req.userId)
+if(!user){
+    return res.status(400).json({
+        message:"user not found"
+    })
+}
+const company = await companySchema.findById(user.Company)
+const getjoinreq = await company.partnerjoinrequest
+const viewpartner = await partnerSchema.findById(getjoinreq)
+res.status(200).json({
+    message:"company joined",
+    data:viewpartner
+})
+}
+
 
 module.exports = {createcompany,getcompany,getusercompany,
-    getcompanybyid,updatecompanydetails,deletecompany};
+    getcompanybyid,updatecompanydetails,deletecompany,joincompany};
