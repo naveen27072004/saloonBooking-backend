@@ -166,6 +166,22 @@ res.status(200).json({
 })
 }
 
+const accpetjoinreq = async(req,res)=>{
+    try {
+        const {partnerId} = req.params
+        if(!partnerId){
+            res.status(400).json({
+                message:"partner not fount"
+            })
+        }
+        const partner = await partnerSchema.findById(partnerId)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 module.exports = {createcompany,getcompany,getusercompany,
-    getcompanybyid,updatecompanydetails,deletecompany,joincompany};
+    getcompanybyid,updatecompanydetails,deletecompany,joincompany,
+    accpetjoinreq
+};
